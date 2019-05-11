@@ -9,5 +9,4 @@ public class HangmanApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(HangmanApplication.class, args);
 	}
-
 }
