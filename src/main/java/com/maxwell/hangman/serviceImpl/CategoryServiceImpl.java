@@ -29,5 +29,9 @@ public class CategoryServiceImpl  implements CategoryService {
 	public Category updateCategory(Category category) {
 		return repository.save(category);
 	}
+	
+	public Category findCategoryById(Long id) {
+		return repository.findById(id).orElse(null);
+	}
 
 }

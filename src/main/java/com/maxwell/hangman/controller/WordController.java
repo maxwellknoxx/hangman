@@ -52,6 +52,7 @@ public class WordController {
 
 		try {
 			listWords = service.findByCategoryId(id);
+			listWords.forEach(word -> System.out.println(word.getWord()));
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", true);
 		} catch (Exception e) {
