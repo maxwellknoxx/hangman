@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.hangman.entity.Category;
-import com.maxwell.hangman.entity.Word;
 import com.maxwell.hangman.response.Response;
 import com.maxwell.hangman.response.ResponseUtils;
 import com.maxwell.hangman.serviceImpl.CategoryServiceImpl;
