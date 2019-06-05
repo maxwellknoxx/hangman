@@ -7,7 +7,6 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -21,7 +20,7 @@ import com.maxwell.hangman.response.Response;
 import com.maxwell.hangman.response.ResponseUtils;
 import com.maxwell.hangman.serviceImpl.WordServiceImpl;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "*")
 @RestController
 public class WordController {
 
@@ -53,7 +52,7 @@ public class WordController {
 
 		try {
 			listWords = service.findByCategoryId(id);
-			listWords.forEach(word -> System.out.println(word.getWord()));
+			//listWords.forEach(word -> System.out.println(word.getWord()));
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", true);
 		} catch (Exception e) {
@@ -64,16 +63,21 @@ public class WordController {
 	}
 
 	@GetMapping(path = "/api/word/play/{id}")
-	public ResponseEntity<Response<Word>> play(@PathVariable(name = "id") Long id) {
-		Response<Word> response = new Response<>();
+	public ResponseEntity<Response<PlayingWord>> play(@PathVariable(name = "id") Long id) {
+		Response<PlayingWord> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
 		Word word = new Word();
+		PlayingWord playingWord = new PlayingWord();
 
 		try {
 			listWords = service.findByCategoryId(id);
 			int randomIndex = (int) (Math.random() * listWords.size());
 			word = listWords.get(randomIndex);
-			response.setData(word);
+			playingWord.setPlayingWord(word.getWord());
+			playingWord.setCurrentWord(hiddeWord(playingWord.getPlayingWord()));
+			playingWord.setStatus(false);
+			playingWord.setWordCompleted(false);
+			response.setData(playingWord);
 			response = responseUtils.setMessages(response, "Resources have been found", true);
 		} catch (Exception e) {
 			return responseUtils.setExceptionMessage(response, e);
@@ -82,15 +86,23 @@ public class WordController {
 		return ResponseEntity.ok(response);
 	}
 	
-	@PostMapping(path = "/api/word/GuessWord")
+	public String hiddeWord(String word) {
+		String currentWordTemporary = "";
+		for(int i = 0; i < word.length(); i++) {
+			currentWordTemporary = currentWordTemporary + "-";
+		}
+		return currentWordTemporary;
+	}
+	
+	@PostMapping(path = "/api/word/guessWord")
 	public ResponseEntity<Response<PlayingWord>> GuessWord(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
 		
 		if(isCorrectWord(playingWord)) {
-			playingWord.setStatus(true);
+			playingWord.setWordCompleted(true);
 			response = responseUtils.setMessages(response, "You are right, the word is " + playingWord.getPlayingWord(), true);
 		}  else  {
-			playingWord.setStatus(false);
+			playingWord.setWordCompleted(false);
 			response = responseUtils.setMessages(response, "You are wrong", false);
 		}
 		
@@ -101,9 +113,10 @@ public class WordController {
 	
 	public Boolean isCorrectWord(PlayingWord playingWord) {
 		if(playingWord.getPlayingWord().equals(playingWord.getGuessWord().toUpperCase())) {
+			playingWord.setWordCompleted(true);
 			return true;
 		}
-		
+		playingWord.setWordCompleted(false);
 		return false;
 	}
 
@@ -133,46 +146,47 @@ public class WordController {
 	}
 	
 	public PlayingWord completeWord(PlayingWord playingWord) {
-		int position = playingWord.getPlayingWord().indexOf(playingWord.getLetter());
+		String currentWord = playingWord.getCurrentWord();
+		char character = playingWord.getLetter().charAt(0);
+		for(int i = 0; i < playingWord.getPlayingWord().length(); i++){
+		    if(playingWord.getPlayingWord().charAt(i) == character){
+		    	currentWord = currentWord.substring(0, i) + character + currentWord.substring(i + 1);
+		    }
+		}
 		
-		String word = playingWord.getCurrentWord().substring(0, position) + playingWord.getLetter() + playingWord.getCurrentWord().substring(position + 1);
-		playingWord.setCurrentWord(word);
+		playingWord.setCurrentWord(currentWord);
 		
 		return playingWord;
 	}
 
-	// remove
-	@PostMapping(path = "/api/word/addWord")
-	public ResponseEntity<Response<Word>> addWord(@Valid @RequestBody Word word, BindingResult result) {
-		Response<Word> response = new Response<>();
-		Word wordFromDB = new Word();
-
-		try {
-			wordFromDB = service.addWord(word);
-			response.setData(wordFromDB);
-			response = responseUtils.setMessages(response, word.getWord() + " has been added", true);
-		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
-		}
-
-		return ResponseEntity.ok(response);
-	}
-
-	// remove
-	@PostMapping(path = "/api/word/updateWord")
-	public ResponseEntity<Response<Word>> updateWord(@Valid @RequestBody Word word, BindingResult result) {
-		Response<Word> response = new Response<>();
-		Word wordFromDB = new Word();
-
-		try {
-			wordFromDB = service.updateWord(word);
-			response.setData(wordFromDB);
-			response = responseUtils.setMessages(response, word.getWord() + " has been updated", true);
-		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
-		}
-
-		return ResponseEntity.ok(response);
-	}
+	/*
+	 * // remove
+	 * 
+	 * @PostMapping(path = "/api/word/addWord") public
+	 * ResponseEntity<Response<Word>> addWord(@Valid @RequestBody Word word,
+	 * BindingResult result) { Response<Word> response = new Response<>(); Word
+	 * wordFromDB = new Word();
+	 * 
+	 * try { wordFromDB = service.addWord(word); response.setData(wordFromDB);
+	 * response = responseUtils.setMessages(response, word.getWord() +
+	 * " has been added", true); } catch (Exception e) { return
+	 * responseUtils.setExceptionMessage(response, e); }
+	 * 
+	 * return ResponseEntity.ok(response); }
+	 * 
+	 * // remove
+	 * 
+	 * @PostMapping(path = "/api/word/updateWord") public
+	 * ResponseEntity<Response<Word>> updateWord(@Valid @RequestBody Word word,
+	 * BindingResult result) { Response<Word> response = new Response<>(); Word
+	 * wordFromDB = new Word();
+	 * 
+	 * try { wordFromDB = service.updateWord(word); response.setData(wordFromDB);
+	 * response = responseUtils.setMessages(response, word.getWord() +
+	 * " has been updated", true); } catch (Exception e) { return
+	 * responseUtils.setExceptionMessage(response, e); }
+	 * 
+	 * return ResponseEntity.ok(response); }
+	 */
 
 }

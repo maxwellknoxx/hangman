@@ -7,6 +7,7 @@ public class PlayingWord {
 	private String currentWord;
 	private String guessWord;
 	private Boolean status;
+	private Boolean wordCompleted;
 
 	public String getPlayingWord() {
 		return playingWord;
@@ -46,6 +47,14 @@ public class PlayingWord {
 
 	public void setStatus(Boolean status) {
 		this.status = status;
+	}
+
+	public Boolean getWordCompleted() {
+		return wordCompleted;
+	}
+
+	public void setWordCompleted(Boolean wordCompleted) {
+		this.wordCompleted = wordCompleted;
 	}
 
 }
