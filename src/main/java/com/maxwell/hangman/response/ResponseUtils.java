@@ -1,28 +1,26 @@
 package com.maxwell.hangman.response;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
+
+import com.maxwell.hangman.utils.ApplicationLogUtils;
+
 
 public class ResponseUtils {
+	
+	ApplicationLogUtils log = new ApplicationLogUtils();
 
-	public <T> ResponseEntity<Response<T>> validate(Response<T> response, BindingResult result) {
-		if (result.hasErrors()) {
-			result.getAllErrors().forEach(errors -> response.getErrors().add(errors.getDefaultMessage()));
-			return ResponseEntity.badRequest().body(response);
-		}
-		return null;
-	}
-
-	public <T> Response<T> setMessages(Response<T> response, String message, Boolean status) {
+	public <T> Response<T> setMessages(Response<T> response, String message, String currentClass, Boolean status) {
 		response.setMessage(message);
 		response.setStatus(status);
+		log.generateLog(message, currentClass);
 		return response;
 	}
 
-	public <T> ResponseEntity<Response<T>> setExceptionMessage(Response<T> response, Exception e) {
+	public <T> ResponseEntity<Response<T>> setExceptionMessage(Response<T> response, Exception e, String currentClass) {
 		e.printStackTrace();
 		response.getErrors().add(e.getCause().toString());
 		response.setStatus(false);
+		log.generateLog(e.getCause().toString(), currentClass);
 		return ResponseEntity.badRequest().body(response);
 	}
 

@@ -37,9 +37,9 @@ public class WordController {
 		try {
 			listWords = service.findAll();
 			response.setListData(listWords);
-			response = responseUtils.setMessages(response, "Resources have been found", true);
+			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			return responseUtils.setExceptionMessage(response, e, "WordController");
 		}
 
 		return ResponseEntity.ok(response);
@@ -52,11 +52,10 @@ public class WordController {
 
 		try {
 			listWords = service.findByCategoryId(id);
-			//listWords.forEach(word -> System.out.println(word.getWord()));
 			response.setListData(listWords);
-			response = responseUtils.setMessages(response, "Resources have been found", true);
+			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			return responseUtils.setExceptionMessage(response, e, "WordController");
 		}
 
 		return ResponseEntity.ok(response);
@@ -78,41 +77,42 @@ public class WordController {
 			playingWord.setStatus(false);
 			playingWord.setWordCompleted(false);
 			response.setData(playingWord);
-			response = responseUtils.setMessages(response, "Resources have been found", true);
+			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e);
+			return responseUtils.setExceptionMessage(response, e, "WordController");
 		}
 
 		return ResponseEntity.ok(response);
 	}
-	
+
 	public String hiddeWord(String word) {
 		String currentWordTemporary = "";
-		for(int i = 0; i < word.length(); i++) {
+		for (int i = 0; i < word.length(); i++) {
 			currentWordTemporary = currentWordTemporary + "-";
 		}
 		return currentWordTemporary;
 	}
-	
+
 	@PostMapping(path = "/api/word/guessWord")
 	public ResponseEntity<Response<PlayingWord>> GuessWord(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
-		
-		if(isCorrectWord(playingWord)) {
+
+		if (isCorrectWord(playingWord)) {
 			playingWord.setWordCompleted(true);
-			response = responseUtils.setMessages(response, "You are right, the word is " + playingWord.getPlayingWord(), true);
-		}  else  {
+			response = responseUtils.setMessages(response, "You are right, the word is " + playingWord.getPlayingWord(),
+					"WordController", true);
+		} else {
 			playingWord.setWordCompleted(false);
-			response = responseUtils.setMessages(response, "You are wrong", false);
+			response = responseUtils.setMessages(response, "You are wrong", "WordController", false);
 		}
-		
+
 		response.setData(playingWord);
-		
+
 		return ResponseEntity.ok(response);
 	}
-	
+
 	public Boolean isCorrectWord(PlayingWord playingWord) {
-		if(playingWord.getPlayingWord().equals(playingWord.getGuessWord().toUpperCase())) {
+		if (playingWord.getPlayingWord().equals(playingWord.getGuessWord().toUpperCase())) {
 			playingWord.setWordCompleted(true);
 			return true;
 		}
@@ -123,16 +123,18 @@ public class WordController {
 	@PostMapping(path = "/api/word/verifyLetter")
 	public ResponseEntity<Response<PlayingWord>> verifyLetter(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
-		
-		if(validatePlayedLetter(playingWord)) {
+
+		if (validatePlayedLetter(playingWord)) {
 			playingWord = completeWord(playingWord);
-			response = responseUtils.setMessages(response, "The word has the letter " + playingWord.getLetter(), true);
-		}  else  {
-			response = responseUtils.setMessages(response, "The word does not have the letter " + playingWord.getLetter(), false);
+			response = responseUtils.setMessages(response, "The word has the letter " + playingWord.getLetter(),
+					"WordController", true);
+		} else {
+			response = responseUtils.setMessages(response,
+					"The word does not have the letter " + playingWord.getLetter(), "WordController", false);
 		}
-		
+
 		response.setData(playingWord);
-		
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -144,49 +146,19 @@ public class WordController {
 		playingWord.setStatus(false);
 		return false;
 	}
-	
+
 	public PlayingWord completeWord(PlayingWord playingWord) {
 		String currentWord = playingWord.getCurrentWord();
 		char character = playingWord.getLetter().charAt(0);
-		for(int i = 0; i < playingWord.getPlayingWord().length(); i++){
-		    if(playingWord.getPlayingWord().charAt(i) == character){
-		    	currentWord = currentWord.substring(0, i) + character + currentWord.substring(i + 1);
-		    }
+		for (int i = 0; i < playingWord.getPlayingWord().length(); i++) {
+			if (playingWord.getPlayingWord().charAt(i) == character) {
+				currentWord = currentWord.substring(0, i) + character + currentWord.substring(i + 1);
+			}
 		}
-		
+
 		playingWord.setCurrentWord(currentWord);
-		
+
 		return playingWord;
 	}
-
-	/*
-	 * // remove
-	 * 
-	 * @PostMapping(path = "/api/word/addWord") public
-	 * ResponseEntity<Response<Word>> addWord(@Valid @RequestBody Word word,
-	 * BindingResult result) { Response<Word> response = new Response<>(); Word
-	 * wordFromDB = new Word();
-	 * 
-	 * try { wordFromDB = service.addWord(word); response.setData(wordFromDB);
-	 * response = responseUtils.setMessages(response, word.getWord() +
-	 * " has been added", true); } catch (Exception e) { return
-	 * responseUtils.setExceptionMessage(response, e); }
-	 * 
-	 * return ResponseEntity.ok(response); }
-	 * 
-	 * // remove
-	 * 
-	 * @PostMapping(path = "/api/word/updateWord") public
-	 * ResponseEntity<Response<Word>> updateWord(@Valid @RequestBody Word word,
-	 * BindingResult result) { Response<Word> response = new Response<>(); Word
-	 * wordFromDB = new Word();
-	 * 
-	 * try { wordFromDB = service.updateWord(word); response.setData(wordFromDB);
-	 * response = responseUtils.setMessages(response, word.getWord() +
-	 * " has been updated", true); } catch (Exception e) { return
-	 * responseUtils.setExceptionMessage(response, e); }
-	 * 
-	 * return ResponseEntity.ok(response); }
-	 */
 
 }
