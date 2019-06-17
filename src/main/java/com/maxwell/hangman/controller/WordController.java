@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.hangman.entity.Word;
+import com.maxwell.hangman.exception.ResourceNotFoundException;
 import com.maxwell.hangman.model.PlayingWord;
 import com.maxwell.hangman.response.Response;
 import com.maxwell.hangman.response.ResponseUtils;
@@ -39,7 +40,7 @@ public class WordController {
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e, "WordController");
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -55,7 +56,7 @@ public class WordController {
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e, "WordController");
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -79,7 +80,7 @@ public class WordController {
 			response.setData(playingWord);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e, "WordController");
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);

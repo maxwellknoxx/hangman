@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.maxwell.hangman.exception.ResourceNotFoundException;
 import com.maxwell.hangman.entity.Category;
 import com.maxwell.hangman.response.Response;
 import com.maxwell.hangman.response.ResponseUtils;
@@ -34,7 +35,7 @@ public class CategoryController {
 			response.setListData(listCategories);
 			response = responseUtils.setMessages(response, "Resources have been found", "CategoryController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e, "CategoryController");
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
@@ -50,7 +51,7 @@ public class CategoryController {
 			response.setData(category);
 			response = responseUtils.setMessages(response, "Resources have been found", "CategoryController", true);
 		} catch (Exception e) {
-			return responseUtils.setExceptionMessage(response, e, "CategoryController");
+			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
 		}
 
 		return ResponseEntity.ok(response);
