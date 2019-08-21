@@ -6,6 +6,7 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.maxwell.hangman.entity.Word;
-import com.maxwell.hangman.exception.ResourceNotFoundException;
 import com.maxwell.hangman.model.PlayingWord;
 import com.maxwell.hangman.response.Response;
 import com.maxwell.hangman.response.ResponseUtils;
@@ -29,9 +29,24 @@ public class WordController {
 	private WordServiceImpl service;
 
 	ResponseUtils responseUtils = new ResponseUtils();
+	
+	@PostMapping(path = "/api/v1/word/words")
+	public ResponseEntity<?> insert(@Valid @RequestBody Word word) {
+		Response<Word> response = new Response<>();
+		
+		try {
+			word = service.addWord(word);
+			response.setData(word);
+			response = responseUtils.setMessages(response, "Word " + word.getWord() + " has been added", "WordController", true);
+		} catch (Exception e) {
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+		}
+		
+		return ResponseEntity.ok(response);
+	}
 
 	@GetMapping(path = "/api/v1/word/words")
-	public ResponseEntity<Response<Word>> findAll() {
+	public ResponseEntity<?> findAll() {
 		Response<Word> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
 
@@ -40,14 +55,14 @@ public class WordController {
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping(path = "/api/v1/word/wordsByCategoryId/{id}")
-	public ResponseEntity<Response<Word>> findAllByCategoryId(@PathVariable(name = "id") Long id) {
+	public ResponseEntity<?> findAllByCategoryId(@PathVariable(name = "id") Long id) {
 		Response<Word> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
 
@@ -56,14 +71,14 @@ public class WordController {
 			response.setListData(listWords);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
 		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping(path = "/api/v1/word/play/{id}")
-	public ResponseEntity<Response<PlayingWord>> play(@PathVariable(name = "id") Long id) {
+	public ResponseEntity<?> play(@PathVariable(name = "id") Long id) {
 		Response<PlayingWord> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
 		Word word = new Word();
@@ -80,7 +95,7 @@ public class WordController {
 			response.setData(playingWord);
 			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
 		} catch (Exception e) {
-			throw new ResourceNotFoundException("Something went wrong! " + e.getMessage());
+			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
 
 		return ResponseEntity.ok(response);
