@@ -29,19 +29,20 @@ public class WordController {
 	private WordServiceImpl service;
 
 	ResponseUtils responseUtils = new ResponseUtils();
-	
+
 	@PostMapping(path = "/api/v1/word/words")
 	public ResponseEntity<?> insert(@Valid @RequestBody Word word) {
 		Response<Word> response = new Response<>();
-		
+
 		try {
 			word = service.addWord(word);
 			response.setData(word);
-			response = responseUtils.setMessages(response, "Word " + word.getWord() + " has been added", "WordController", true);
+			response = responseUtils.setMessages(response, "Word " + word.getWord() + " has been added",
+					"WordController", true);
 		} catch (Exception e) {
 			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
-		
+
 		return ResponseEntity.ok(response);
 	}
 
@@ -93,7 +94,8 @@ public class WordController {
 			playingWord.setStatus(false);
 			playingWord.setWordCompleted(false);
 			response.setData(playingWord);
-			response = responseUtils.setMessages(response, "Resources have been found", "WordController", true);
+			response = responseUtils.setMessages(response, "Playing word => " + playingWord.getPlayingWord(),
+					"WordController", true);
 		} catch (Exception e) {
 			return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 		}
@@ -128,7 +130,7 @@ public class WordController {
 	}
 
 	public Boolean isCorrectWord(PlayingWord playingWord) {
-		if (playingWord.getPlayingWord().equals(playingWord.getGuessWord().toUpperCase())) {
+		if (playingWord.getPlayingWord().toUpperCase().equals(playingWord.getGuessWord().toUpperCase())) {
 			playingWord.setWordCompleted(true);
 			return true;
 		}
@@ -142,8 +144,14 @@ public class WordController {
 
 		if (validatePlayedLetter(playingWord)) {
 			playingWord = completeWord(playingWord);
-			response = responseUtils.setMessages(response, "The word has the letter " + playingWord.getLetter(),
-					"WordController", true);
+			if (isCorrectWord(playingWord)) {
+				playingWord.setWordCompleted(true);
+				response = responseUtils.setMessages(response,
+						"You are right, the word is " + playingWord.getPlayingWord(), "WordController", true);
+			} else {
+				response = responseUtils.setMessages(response, "The word has the letter " + playingWord.getLetter(),
+						"WordController", true);
+			}
 		} else {
 			response = responseUtils.setMessages(response,
 					"The word does not have the letter " + playingWord.getLetter(), "WordController", false);
@@ -155,7 +163,7 @@ public class WordController {
 	}
 
 	public Boolean validatePlayedLetter(PlayingWord playingWord) {
-		if (playingWord.getPlayingWord().contains(playingWord.getLetter().toUpperCase())) {
+		if (playingWord.getPlayingWord().toUpperCase().contains(playingWord.getLetter().toUpperCase())) {
 			playingWord.setStatus(true);
 			return true;
 		}
@@ -165,9 +173,9 @@ public class WordController {
 
 	public PlayingWord completeWord(PlayingWord playingWord) {
 		String currentWord = playingWord.getCurrentWord();
-		char character = playingWord.getLetter().charAt(0);
+		char character = playingWord.getLetter().toUpperCase().charAt(0);
 		for (int i = 0; i < playingWord.getPlayingWord().length(); i++) {
-			if (playingWord.getPlayingWord().charAt(i) == character) {
+			if (playingWord.getPlayingWord().toUpperCase().charAt(i) == character) {
 				currentWord = currentWord.substring(0, i) + character + currentWord.substring(i + 1);
 			}
 		}
