@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +26,12 @@ public class CategoryController {
 
 	ResponseUtils responseUtils = new ResponseUtils();
 
-	@GetMapping(path = "/api/category/findAll")
+	@GetMapping(path = "/api/v1/category/helloword")
+	public ResponseEntity<?> helloword(){
+		return new ResponseEntity<String>("Hello, World", HttpStatus.OK);
+	}
+
+	@GetMapping(path = "/api/v1/category/categories")
 	public ResponseEntity<Response<Category>> findAll() {
 		Response<Category> response = new Response<>();
 		List<Category> listCategories = new ArrayList<>();
@@ -41,7 +47,7 @@ public class CategoryController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(path = "/api/category/findCategoryById/{id}")
+	@GetMapping(path = "/api/v1/category/categoriesById/{id}")
 	public ResponseEntity<Response<Category>> findAllByCategoryId(@PathVariable(name = "id") Long id) {
 		Response<Category> response = new Response<>();
 		Category category = new Category();

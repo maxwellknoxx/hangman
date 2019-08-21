@@ -30,7 +30,7 @@ public class WordController {
 
 	ResponseUtils responseUtils = new ResponseUtils();
 
-	@GetMapping(path = "/api/word/findAll")
+	@GetMapping(path = "/api/v1/word/words")
 	public ResponseEntity<Response<Word>> findAll() {
 		Response<Word> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
@@ -46,7 +46,7 @@ public class WordController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(path = "/api/word/findAllByCategoryId/{id}")
+	@GetMapping(path = "/api/v1/word/wordsByCategoryId/{id}")
 	public ResponseEntity<Response<Word>> findAllByCategoryId(@PathVariable(name = "id") Long id) {
 		Response<Word> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
@@ -62,7 +62,7 @@ public class WordController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping(path = "/api/word/play/{id}")
+	@GetMapping(path = "/api/v1/word/play/{id}")
 	public ResponseEntity<Response<PlayingWord>> play(@PathVariable(name = "id") Long id) {
 		Response<PlayingWord> response = new Response<>();
 		List<Word> listWords = new ArrayList<>();
@@ -94,7 +94,7 @@ public class WordController {
 		return currentWordTemporary;
 	}
 
-	@PostMapping(path = "/api/word/guessWord")
+	@PostMapping(path = "/api/v1/word/guessWord")
 	public ResponseEntity<Response<PlayingWord>> GuessWord(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
 
@@ -121,7 +121,7 @@ public class WordController {
 		return false;
 	}
 
-	@PostMapping(path = "/api/word/verifyLetter")
+	@PostMapping(path = "/api/v1/word/verifyLetter")
 	public ResponseEntity<Response<PlayingWord>> verifyLetter(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
 
