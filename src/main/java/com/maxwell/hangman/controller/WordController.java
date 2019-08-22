@@ -138,14 +138,22 @@ public class WordController {
 		return false;
 	}
 
+	public Boolean compareCurrentWord(PlayingWord playingWord) {
+		if (playingWord.getPlayingWord().toUpperCase().equals(playingWord.getCurrentWord().toUpperCase())) {
+			playingWord.setWordCompleted(true);
+			return true;
+		}
+		playingWord.setWordCompleted(false);
+		return false;
+	}
+
 	@PostMapping(path = "/api/v1/word/verifyLetter")
 	public ResponseEntity<Response<PlayingWord>> verifyLetter(@Valid @RequestBody PlayingWord playingWord) {
 		Response<PlayingWord> response = new Response<>();
 
 		if (validatePlayedLetter(playingWord)) {
 			playingWord = completeWord(playingWord);
-			if (isCorrectWord(playingWord)) {
-				playingWord.setWordCompleted(true);
+			if (compareCurrentWord(playingWord)) {
 				response = responseUtils.setMessages(response,
 						"You are right, the word is " + playingWord.getPlayingWord(), "WordController", true);
 			} else {
@@ -177,6 +185,7 @@ public class WordController {
 		for (int i = 0; i < playingWord.getPlayingWord().length(); i++) {
 			if (playingWord.getPlayingWord().toUpperCase().charAt(i) == character) {
 				currentWord = currentWord.substring(0, i) + character + currentWord.substring(i + 1);
+				break;
 			}
 		}
 
